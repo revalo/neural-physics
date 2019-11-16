@@ -22,9 +22,9 @@ class World(object):
 
         # Add invisible walls at edges.
         self.add_entity(Wall((-5, self.height / 2), 10, self.height))
-        self.add_entity(Wall((self.width + 10, self.height / 2), 10, self.height))
+        self.add_entity(Wall((self.width + 5, self.height / 2), 10, self.height))
         self.add_entity(Wall((self.width / 2, -5), self.width, 10))
-        self.add_entity(Wall((self.width / 2, self.height + 10), self.width, 10))
+        self.add_entity(Wall((self.width / 2, self.height + 5), self.width, 10))
 
     def add_entity(self, entity):
         body_def = entity.get_body_def()
