@@ -106,7 +106,11 @@ def collect_data(
 
 if __name__ == "__main__":
     # Training
-    collect_data(num_sequences=400, seed=1337, data_directory="data/threecircles_64/train")
+    collect_data(
+        num_sequences=400, seed=1337, data_directory="data/threecircles_64/train"
+    )
 
     # Validation
-    collect_data(num_sequences=20, seed=12398, data_directory="data/threecircles_64/val")
+    collect_data(
+        num_sequences=20, seed=12398, data_directory="data/threecircles_64/val"
+    )
