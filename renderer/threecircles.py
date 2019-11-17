@@ -84,13 +84,13 @@ class ThreeCircles(object):
 def collect_data(
     sequence_length=500,
     num_sequences=400,
-    data_directory="data/threecircles/train",
+    data_directory="data/threecircles_128/train",
     seed=1337,
 ):
     random.seed(seed)
 
     for sequence in tqdm.tqdm(range(num_sequences)):
-        scene = ThreeCircles(headless=True)
+        scene = ThreeCircles(headless=True, width=64, height=64, radius=5)
 
         os.mkdir(os.path.join(data_directory, str(sequence)))
 
@@ -106,7 +106,7 @@ def collect_data(
 
 if __name__ == "__main__":
     # Training
-    collect_data(num_sequences=400, seed=1337, data_directory="data/threecircles/train")
+    collect_data(num_sequences=400, seed=1337, data_directory="data/threecircles_64/train")
 
     # Validation
-    collect_data(num_sequences=20, seed=12398, data_directory="data/threecircles/val")
+    collect_data(num_sequences=20, seed=12398, data_directory="data/threecircles_64/val")
