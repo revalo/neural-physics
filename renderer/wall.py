@@ -1,8 +1,8 @@
 import pygame
 import Box2D
 
-from constants import BOX2D_MUL
-from entity import Entity
+from renderer.constants import BOX2D_MUL
+from renderer.entity import Entity
 
 
 class Wall(Entity):

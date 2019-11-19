@@ -3,11 +3,11 @@ import random
 import os
 import tqdm
 
-from constants import TARGET_FPS
+from renderer.constants import TARGET_FPS
 
-from world import World
-from circle import Circle
-from wall import Wall
+from renderer.world import World
+from renderer.circle import Circle
+from renderer.wall import Wall
 
 BACKGROUND = (255, 255, 255)
 
@@ -17,13 +17,21 @@ COLORS = [
     (0, 0, 255),
 ]
 
-MAX_VELOCITY = 25
+MAX_VELOCITY = 10
+
+
+def random_velocity_component(max_velocity):
+    if random.random() > 0.5:
+        return random.randrange(15, max_velocity)
+    return random.randrange(-max_velocity, -15)
 
 
 class ThreeCircles(object):
     def __init__(self, headless=True, width=256, height=256, radius=20):
         self.headless = headless
         self.world = World(width, height)
+        self.width = width
+        self.height = height
 
         self.circles = [
             Circle(
@@ -32,8 +40,8 @@ class ThreeCircles(object):
                     random.randint(radius, height - radius),
                 ),
                 velocity=(
-                    random.randrange(-MAX_VELOCITY, MAX_VELOCITY),
-                    random.randrange(-MAX_VELOCITY, MAX_VELOCITY),
+                    random.randint(-MAX_VELOCITY, MAX_VELOCITY),
+                    random.randint(-MAX_VELOCITY, MAX_VELOCITY),
                 ),
                 r=radius,
             )
@@ -58,6 +66,7 @@ class ThreeCircles(object):
         self.clock = pygame.time.Clock()
 
     def step(self):
+        # self.world.step(1.0 / 10.0)
         self.world.step(1.0 / TARGET_FPS)
 
     def draw(self):

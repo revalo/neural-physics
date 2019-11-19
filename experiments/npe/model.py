@@ -5,8 +5,8 @@ import tensorflow as tf
 import tensorflow.keras as keras
 
 
-def get_npe_model(state_dim=2, past_timesteps=2, max_pairs=8, pair_encoding_dim=16):
-    """Gets the NPE model.
+def get_npe_model(state_dim=2, past_timesteps=2, max_pairs=3, pair_encoding_dim=32):
+    """Gets the neural physics engine model.
 
     state_dim: Length of the vector to represent the state of each object.
     past_timesteps: Number of timesteps in past given to the model.
@@ -34,8 +34,11 @@ def get_npe_model(state_dim=2, past_timesteps=2, max_pairs=8, pair_encoding_dim=
     encoded_b = state_model(state_b)
 
     concatenated = keras.layers.concatenate([encoded_a, encoded_b])
-    x = keras.layers.Dense(32, activation="relu")(concatenated)
-    x = keras.layers.Dense(32, activation="relu")(x)
+    x = keras.layers.Dense(50, activation="relu")(concatenated)
+    x = keras.layers.Dense(50, activation="relu")(x)
+    x = keras.layers.Dense(50, activation="relu")(x)
+    x = keras.layers.Dense(50, activation="relu")(x)
+    x = keras.layers.Dense(50, activation="relu")(x)
     # TODO(shreyask): This could probably use a perf boost.
     encoded_pair = keras.layers.Dense(pair_encoding_dim, activation="relu")(x) * used[0]
     pair_model = keras.Model([state_a, state_b, used], encoded_pair)
@@ -44,10 +47,12 @@ def get_npe_model(state_dim=2, past_timesteps=2, max_pairs=8, pair_encoding_dim=
     key_state_input = keras.layers.Input(shape=(num_states,))
     pair_encodings_sum = keras.layers.Input(shape=(pair_encoding_dim,))
     concatenated = keras.layers.concatenate([key_state_input, pair_encodings_sum])
-    x = keras.layers.Dense(32, activation="relu")(concatenated)
-    x = keras.layers.Dense(32, activation="relu")(x)
-    x = keras.layers.Dense(16, activation="relu")(x)
-    velocity = keras.layers.Dense(1, activation="relu")(x)
+    x = keras.layers.Dense(50, activation="relu")(concatenated)
+    x = keras.layers.Dense(50, activation="relu")(x)
+    x = keras.layers.Dense(50, activation="relu")(x)
+    x = keras.layers.Dense(50, activation="relu")(x)
+    x = keras.layers.Dense(50, activation="relu")(x)
+    velocity = keras.layers.Dense(state_dim, activation="linear")(x)
     decoder_model = keras.Model([key_state_input, pair_encodings_sum], velocity)
 
     # Define the NPE model.

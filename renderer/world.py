@@ -1,9 +1,9 @@
 """Renderer does physics simulations and rendering.
 """
 
-from constants import BOX2D_MUL, PHYSICS_MUL
+from renderer.constants import BOX2D_MUL, PHYSICS_MUL
 
-from wall import Wall
+from renderer.wall import Wall
 
 import Box2D
 
