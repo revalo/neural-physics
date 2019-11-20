@@ -1,8 +1,6 @@
 """Renderer does physics simulations and rendering.
 """
 
-from renderer.constants import BOX2D_MUL, PHYSICS_MUL
-
 from renderer.wall import Wall
 
 import pymunk

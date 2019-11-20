@@ -50,7 +50,7 @@ def show_simulation(model, width=256, height=256, radius=30, length=500, past_st
                 ]
             )[0]
 
-            states[i].append(states[i][-1] + delta)
+            states[i].append(states[i][-1] + delta / 10.0)
 
         for i, circle in enumerate(scene.circles):
             circle.position = (states[i][-1][0] * width, states[i][-1][1] * height)

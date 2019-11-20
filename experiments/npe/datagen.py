@@ -6,6 +6,8 @@ import random
 import renderer.threecircles as threecircles
 import numpy as np
 
+from renderer.constants import TARGET_FPS
+
 
 def normalize_position(position, width, height):
     x, y = position
@@ -73,7 +75,9 @@ def collect_data(
             scene.step()
             next_position = normalize_position(key_circle.position, width, height)
 
-            final_state = np.array(next_position) - np.array(prev_position)
+            final_state = TARGET_FPS * (
+                np.array(next_position) - np.array(prev_position)
+            )
 
             X.append([key_state] + context_states + used)
             y.append(final_state)

@@ -1,7 +1,6 @@
 import pygame
 import pymunk
 
-from renderer.constants import BOX2D_MUL
 from renderer.entity import Entity
 
 
