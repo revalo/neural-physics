@@ -5,7 +5,7 @@ from renderer.constants import BOX2D_MUL, PHYSICS_MUL
 
 from renderer.wall import Wall
 
-import Box2D
+import pymunk
 
 
 class World(object):
@@ -13,10 +13,11 @@ class World(object):
         self.width = width
         self.height = height
 
-        self.world = Box2D.b2World(gravity=gravity, doSleep=True)
+        self.space = pymunk.Space()
+        self.space.gravity = gravity
 
         self.entities = {}
-        self.bodies = {}
+        self.shapes = {}
 
         self.id_counter = 0
 
@@ -27,46 +28,41 @@ class World(object):
         self.add_entity(Wall((self.width / 2, self.height + 5), self.width, 10))
 
     def add_entity(self, entity):
-        body_def = entity.get_body_def()
-        body = self.world.CreateBody(body_def)
-        body.CreateFixture(entity.get_fixture())
+        shape = entity.get_shape()
+        self.space.add(shape.body, shape)
 
         entity.id = self.id_counter
 
-        self.bodies[entity.id] = body
+        self.shapes[entity.id] = shape
         self.entities[entity.id] = entity
 
         self.id_counter += 1
 
     def remove_entity(self, entity):
-        body = self.bodies[entity.id]
+        shape = self.shapes[entity.id]
 
-        self.world.destroyBody(body)
+        self.space.remove(shape.body, shape)
 
-        del self.bodies[entity.id]
+        del self.shapes[entity.id]
         del self.entities[entity.id]
 
     def copy_to_entity(self, entity):
-        body = self.bodies[entity.id]
+        shape = self.shapes[entity.id]
 
-        x, y = body.position
-
-        entity.position = (x * PHYSICS_MUL, y * PHYSICS_MUL)
-        entity.velocity = body.linearVelocity
+        entity.position = shape.body.position
+        entity.velocity = shape.body.velocity
 
     def copy_from_entity(self, entity):
-        body = self.bodies[entity.id]
+        shape = self.shapes[entity.id]
 
-        x, y = entity.position
-
-        body.position = (x * BOX2D_MUL, y * BOX2D_MUL)
-        body.linearVelocity = entity.velocity
+        shape.body.position = entity.position
+        shape.body.velocity = entity.velocity
 
     def step(self, dt=0.01):
         for entity in self.entities.values():
             self.copy_from_entity(entity)
 
-        self.world.Step(dt, 8, 3)
+        self.space.step(dt)
 
         for entity in self.entities.values():
             self.copy_to_entity(entity)

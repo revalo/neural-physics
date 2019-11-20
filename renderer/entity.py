@@ -9,11 +9,7 @@ class Entity(abc.ABC):
         self.id = -1
 
     @abc.abstractmethod
-    def get_body_def(self):
-        pass
-
-    @abc.abstractmethod
-    def get_fixture(self):
+    def get_shape(self):
         pass
 
     @abc.abstractmethod

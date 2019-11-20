@@ -17,13 +17,7 @@ COLORS = [
     (0, 0, 255),
 ]
 
-MAX_VELOCITY = 10
-
-
-def random_velocity_component(max_velocity):
-    if random.random() > 0.5:
-        return random.randrange(15, max_velocity)
-    return random.randrange(-max_velocity, -15)
+MAX_VELOCITY = 150
 
 
 class ThreeCircles(object):
@@ -66,7 +60,6 @@ class ThreeCircles(object):
         self.clock = pygame.time.Clock()
 
     def step(self):
-        # self.world.step(1.0 / 10.0)
         self.world.step(1.0 / TARGET_FPS)
 
     def draw(self):
