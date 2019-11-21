@@ -52,8 +52,14 @@ class Environment(object):
         self.height = height
         self.radius = radius
 
+        # Setup scene replicas.
+        self.scenes = [
+            ThreeCircles(width=self.width, height=self.height, radius=self.radius)
+            for _ in range(self.batch_size)
+        ]
+
     def get_reward(self, configurations):
-        """Returns the reward given a configuration vectors.
+        """Returns the reward given configuration vectors.
 
         The configuration vector specifies the initial locations and velocities of the
         three balls. [x1, y1, vx1, vy1, ...]
@@ -62,15 +68,11 @@ class Environment(object):
         configurations should be (batch_size, 4*3).
         """
 
+        num_circles = len(self.scenes[0].circles)
+
         # Initialize scenes with initial velocities and positions from configs.
-        scenes = [
-            ThreeCircles(width=self.width, height=self.height, radius=self.radius)
-            for _ in range(self.batch_size)
-        ]
-
-        num_circles = len(scenes[0].circles)
-
-        for s_i, scene in enumerate(scenes):
+        print("Scene Setup.")
+        for s_i, scene in enumerate(self.scenes):
             configuration = configurations[s_i]
 
             for c_i, circle in enumerate(scene.circles):
@@ -94,28 +96,30 @@ class Environment(object):
         # given true values. Right now we're doing the second approach.
 
         actual_states = np.zeros(
-            (len(scenes), num_circles, self.episodes, 2), dtype=np.float32
+            (len(self.scenes), num_circles, self.episodes, 2), dtype=np.float32
         )
 
         predicted_states = np.zeros(
-            (len(scenes), num_circles, self.episodes, 2), dtype=np.float32
+            (len(self.scenes), num_circles, self.episodes, 2), dtype=np.float32
         )
 
         errors = []
 
         # Run simulations.
+        print("Generate simulations.")
         for episode in range(self.episodes):
-            for s_i, scene in enumerate(scenes):
+            for s_i, scene in enumerate(self.scenes):
                 scene.step()
 
                 for c_i, circle in enumerate(scene.circles):
                     actual_states[s_i, c_i, episode] = get_circle_state(scene, circle)
 
         # Make model predictions.
+        print("Make predictions.")
         for episode in range(self.past_timesteps, self.episodes):
             current_state = actual_states[
                 :, :, episode - self.past_timesteps : episode, :
-            ].reshape((len(scenes), num_circles, self.past_timesteps * 2))
+            ].reshape((len(self.scenes), num_circles, self.past_timesteps * 2))
 
             for focus_circle_index in range(num_circles):
                 context_indices = [
@@ -132,7 +136,7 @@ class Environment(object):
                     ]
                     # Used masks.
                     + [
-                        np.ones((len(scenes), 1), dtype=np.float32)
+                        np.ones((len(self.scenes), 1), dtype=np.float32)
                         for _ in context_indices
                     ]
                 )
