@@ -1,8 +1,7 @@
 import pygame
-import Box2D
+import pymunk
 
-from constants import BOX2D_MUL
-from entity import Entity
+from renderer.entity import Entity
 
 
 class Wall(Entity):
@@ -11,22 +10,15 @@ class Wall(Entity):
         self.w = w
         self.h = h
 
-    def get_body_def(self):
-        bodyDef = Box2D.b2BodyDef(
-            position=self.position,
-            linearVelocity=self.velocity,
-            angle=0.0,
-            linearDamping=0.0,
-            type=Box2D.b2_staticBody,
-        )
+    def get_shape(self):
+        body = pymunk.Body(body_type=pymunk.Body.STATIC)
+        body.position = self.position
 
-        return bodyDef
+        box = pymunk.Poly.create_box(body, size=(self.w, self.h))
+        box.friction = 0.0
+        box.elasticity = 0.8
 
-    def get_fixture(self):
-        box = Box2D.b2PolygonShape(box=(self.w / 2 * BOX2D_MUL, self.h / 2 * BOX2D_MUL))
-        fixture = Box2D.b2FixtureDef(shape=box, density=1.0, restitution=1.0,)
-
-        return fixture
+        return box
 
     def draw(self, screen, color=(255, 0, 0)):
         x, y = self.position
