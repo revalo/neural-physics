@@ -75,6 +75,7 @@ def collect_data(
             scene.step()
             next_position = normalize_position(key_circle.position, width, height)
 
+            # Final state is the velocity.
             final_state = TARGET_FPS * (
                 np.array(next_position) - np.array(prev_position)
             )
