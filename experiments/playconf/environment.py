@@ -18,15 +18,9 @@ def configuration_to_position(x, y, width, height, radius):
     return min(max(x, radius), width - radius), min(max(y, radius), height - radius)
 
 
-def configuration_to_velocity(vx, vy, width, height):
+def configuration_to_velocity(vx, vy):
     # Scale the velocity.
-    vx, vy = vx * width, vy * height
-
-    # Clamp.
-    return (
-        min(max(vx, -MAX_VELOCITY), MAX_VELOCITY),
-        min(max(vy, -MAX_VELOCITY), MAX_VELOCITY),
-    )
+    return (vx * 2.0 - 1.0) * MAX_VELOCITY, (vy * 2.0 - 1.0) * MAX_VELOCITY
 
 
 class Environment(object):
@@ -81,9 +75,7 @@ class Environment(object):
                 circle.position = configuration_to_position(
                     x, y, self.width, self.height, self.radius
                 )
-                circle.velocity = configuration_to_velocity(
-                    vx, vy, self.width, self.height
-                )
+                circle.velocity = configuration_to_velocity(vx, vy)
 
             # Buffer step to correct for collisions.
             # TODO(shreyask): Maybe this is not needed and might harm the model.
