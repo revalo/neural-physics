@@ -42,6 +42,13 @@ flags.mark_bool_flags_as_mutual_exclusive(
 
 def generate_data():
     if not FLAGS.dataset:
+        print("Please pass in a dataset location.")
+        return
+
+    try:
+        with open(FLAGS.dataset, "wb"):
+            pass
+    except IOError:
         print("Please pass in valid dataset location.")
         return
 
