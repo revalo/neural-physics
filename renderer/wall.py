@@ -17,7 +17,7 @@ class Wall(Entity):
         body.position = self.position
 
         box = pymunk.Poly.create_box(body, size=(self.w, self.h))
-        box.friction = 0.0
+        box.friction = 0.4
         box.elasticity = self.elasticity
 
         return box
