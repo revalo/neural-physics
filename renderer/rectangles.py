@@ -30,7 +30,7 @@ class Rectangles(object):
         self, headless=True, width=256, height=256, rect_height=20, rect_width=20
     ):
         self.headless = headless
-        self.world = World(width, height, gravity=(0,9.8))
+        self.world = World(width, height, gravity=(0, 9.8), wall_elasticity=0.8)
         self.width = width
         self.height = height
 
