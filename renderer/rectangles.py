@@ -24,17 +24,11 @@ MAX_VELOCITY = 150
 NUM_RECTANGLES = 6
 
 
-class Rectangles(object):
+class Rectangles(Scene):
     # position is the center of the box
-    def __init__(
-        self, headless=True, width=256, height=256, rect_height=20, rect_width=20
-    ):
-        self.headless = headless
-        self.world = World(width, height, gravity=(0, 9.8), wall_elasticity=0.8)
-        self.width = width
-        self.height = height
-
-        self.rects = [
+    def __init__(self, headless=True, width=256, height=256,
+                 rect_height=20, rect_width=20, bkg_color=BACKGROUND):
+        rects = [
             Rect(
                 position=(
                     random.randint(rect_width, width - rect_width),
@@ -50,49 +44,17 @@ class Rectangles(object):
             for _ in range(NUM_RECTANGLES)
         ]
 
-        for r in self.rects:
-            self.world.add_entity(r)
-
-        pygame.init()
-        pygame.display.set_caption("SixRectangles")
-
-        if not self.headless:
-            self.screen = pygame.display.set_mode((width, height))
-
-        self.compose_surface = pygame.Surface((width, height))
-        self.binary_surface = pygame.Surface((width, height))
-        self.rect_surfaces = [pygame.Surface((width, height)) for r in self.rects]
-
-        self.clock = pygame.time.Clock()
-
-    def step(self):
-        self.world.step(1.0 / TARGET_FPS)
-
-    def draw(self):
-        self.compose_surface.fill(BACKGROUND)
-        self.binary_surface.fill((0, 0, 0))
-
-        for i, r in enumerate(self.rects):
-            r.draw(self.compose_surface, COLORS[i])
-            r.draw(self.binary_surface, (255, 255, 255))
-
-            # Generate binary masked circle image.
-            self.rect_surfaces[i].fill((0, 0, 0))
-            r.draw(self.rect_surfaces[i], (255, 255, 255))
-
-        if not self.headless:
-            self.screen.blit(self.compose_surface, (0, 0))
-            pygame.display.flip()
-            self.clock.tick(TARGET_FPS)
-
-    def save_image(self, filename):
-        pygame.image.save(self.compose_surface, filename)
+        super(Rectangles, self).__init__(
+            "SixRectangles", rects, COLORS, headless=headless,
+            width=width, height=height, gravity=(0, 9.8), wall_elasticity=0.8,
+            bkg_color=bkg_color
+        )
 
 
 def collect_data(
     sequence_length=500,
     num_sequences=400,
-    data_directory="data/sixrectangles_128/train",
+    data_directory="data/rectangles_128/train",
     seed=1337,
 ):
     random.seed(seed)
