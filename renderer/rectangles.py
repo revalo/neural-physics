@@ -3,13 +3,12 @@ import random
 import os
 import tqdm
 
-from renderer.constants import TARGET_FPS
+from renderer.constants import TARGET_FPS, BACKGROUND
 
 from renderer.world import World
+from renderer.scene import Scene
 from renderer.rect import Rect
 from renderer.wall import Wall
-
-BACKGROUND = (255, 255, 255)
 
 COLORS = [
     (255, 0, 0),
@@ -52,7 +51,7 @@ class Rectangles(object):
             self.world.add_entity(r)
 
         pygame.init()
-        pygame.display.set_caption("ThreeRects")
+        pygame.display.set_caption("SixRectangles")
 
         if not self.headless:
             self.screen = pygame.display.set_mode((width, height))
@@ -87,36 +86,36 @@ class Rectangles(object):
         pygame.image.save(self.compose_surface, filename)
 
 
-# def collect_data(
-#     sequence_length=500,
-#     num_sequences=400,
-#     data_directory="data/threecircles_128/train",
-#     seed=1337,
-# ):
-#     random.seed(seed)
-#
-#     for sequence in tqdm.tqdm(range(num_sequences)):
-#         scene = ThreeCircles(headless=True, width=64, height=64, radius=5)
-#
-#         os.mkdir(os.path.join(data_directory, str(sequence)))
-#
-#         for frame in range(sequence_length):
-#             scene.step()
-#             scene.draw()
-#
-#             pygame.image.save(
-#                 scene.binary_surface,
-#                 os.path.join(data_directory, str(sequence), "%i.png" % (frame)),
-#             )
-#
-# #
-# if __name__ == "__main__":
-#     # Training
-#     collect_data(
-#         num_sequences=400, seed=1337, data_directory="data/threecircles_64/train"
-#     )
-#
-#     # Validation
-#     collect_data(
-#         num_sequences=20, seed=12398, data_directory="data/threecircles_64/val"
-#     )
+def collect_data(
+    sequence_length=500,
+    num_sequences=400,
+    data_directory="data/sixrectangles_128/train",
+    seed=1337,
+):
+    random.seed(seed)
+
+    for sequence in tqdm.tqdm(range(num_sequences)):
+        scene = Rectangles(headless=True, width=64, height=64, rect_height=5, rect_width=5)
+
+        os.mkdir(os.path.join(data_directory, str(sequence)))
+
+        for frame in range(sequence_length):
+            scene.step()
+            scene.draw()
+
+            pygame.image.save(
+                scene.binary_surface,
+                os.path.join(data_directory, str(sequence), "%i.png" % (frame)),
+            )
+
+
+if __name__ == "__main__":
+    # Training
+    collect_data(
+        num_sequences=400, seed=1337, data_directory="data/rectangles_64/train"
+    )
+
+    # Validation
+    collect_data(
+        num_sequences=20, seed=12398, data_directory="data/rectangles_64/val"
+    )
