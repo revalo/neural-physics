@@ -10,11 +10,13 @@ from renderer.world import World
 
 
 class Scene:
-    def __init__(self, scene_name, objects, colors, headless=True, width=256, height=256, bkg_color=BACKGROUND):
+    def __init__(self, scene_name, objects, colors, headless=True,
+                 width=256, height=256, gravity=(0, 0), wall_elasticity=0.8,
+                 bkg_color=BACKGROUND):
         assert(len(objects) == len(colors))
 
         self.headless = headless
-        self.world = World(width, height)
+        self.world = World(width, height, gravity, wall_elasticity)
         self.width = width
         self.height = height
         self.background_color = bkg_color

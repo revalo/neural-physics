@@ -14,10 +14,10 @@ class Rect(Entity):
         self.shape = self._make_shape()
 
     def get_vertices(self):
-        '''
+        """
         Returns the vertices of the box in world coordinates
-            in a counterclockwise winding
-        '''
+        in a counterclockwise winding
+        """
         vertices = []
         for v in self.shape.get_vertices():
             x,y = v.rotated(self.shape.body.angle) + self.shape.body.position
