@@ -9,8 +9,9 @@ class Wall(Entity):
         super(Wall, self).__init__(position, (0, 0))
         self.w = w
         self.h = h
+        self.shape = self._make_shape()
 
-    def get_shape(self):
+    def _make_shape(self):
         body = pymunk.Body(body_type=pymunk.Body.STATIC)
         body.position = self.position
 

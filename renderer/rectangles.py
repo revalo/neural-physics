@@ -21,8 +21,11 @@ COLORS = [
 
 MAX_VELOCITY = 150
 
+NUM_RECTANGLES = 6
+
 
 class Rectangles(object):
+    # position is the center of the box
     def __init__(
         self, headless=True, width=256, height=256, rect_height=20, rect_width=20
     ):
@@ -44,7 +47,7 @@ class Rectangles(object):
                 height=rect_height,
                 width=rect_width,
             )
-            for _ in range(6)
+            for _ in range(NUM_RECTANGLES)
         ]
 
         for r in self.rects:

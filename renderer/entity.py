@@ -8,9 +8,8 @@ class Entity(abc.ABC):
         self.velocity = velocity
         self.id = -1
 
-    @abc.abstractmethod
     def get_shape(self):
-        pass
+        return self.shape
 
     @abc.abstractmethod
     def draw(self, screen, color=(255, 0, 0)):
