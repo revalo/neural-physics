@@ -3,13 +3,12 @@ import random
 import os
 import tqdm
 
-from renderer.constants import TARGET_FPS
+from renderer.constants import TARGET_FPS, BACKGROUND
 
 from renderer.world import World
+from renderer.scene import Scene
 from renderer.circle import Circle
 from renderer.wall import Wall
-
-BACKGROUND = (255, 255, 255)
 
 COLORS = [
     (255, 0, 0),
@@ -20,14 +19,9 @@ COLORS = [
 MAX_VELOCITY = 150
 
 
-class ThreeCircles(object):
-    def __init__(self, headless=True, width=256, height=256, radius=20):
-        self.headless = headless
-        self.world = World(width, height)
-        self.width = width
-        self.height = height
-
-        self.circles = [
+class ThreeCircles(Scene):
+    def __init__(self, headless=True, width=256, height=256, radius=20, bkg_color=BACKGROUND):
+        circles = [
             Circle(
                 position=(
                     random.randint(radius, width - radius),
@@ -42,45 +36,10 @@ class ThreeCircles(object):
             for _ in range(3)
         ]
 
-        for circle in self.circles:
-            self.world.add_entity(circle)
-
-        pygame.init()
-        pygame.display.set_caption("ThreeCircles")
-
-        if not self.headless:
-            self.screen = pygame.display.set_mode((width, height))
-
-        self.compose_surface = pygame.Surface((width, height))
-        self.binary_surface = pygame.Surface((width, height))
-        self.circle_surfaces = [
-            pygame.Surface((width, height)) for circle in self.circles
-        ]
-
-        self.clock = pygame.time.Clock()
-
-    def step(self):
-        self.world.step(1.0 / TARGET_FPS)
-
-    def draw(self):
-        self.compose_surface.fill(BACKGROUND)
-        self.binary_surface.fill((0, 0, 0))
-
-        for i, circle in enumerate(self.circles):
-            circle.draw(self.compose_surface, COLORS[i])
-            circle.draw(self.binary_surface, (255, 255, 255))
-
-            # Generate binary masked circle image.
-            self.circle_surfaces[i].fill((0, 0, 0))
-            circle.draw(self.circle_surfaces[i], (255, 255, 255))
-
-        if not self.headless:
-            self.screen.blit(self.compose_surface, (0, 0))
-            pygame.display.flip()
-            self.clock.tick(TARGET_FPS)
-
-    def save_image(self, filename):
-        pygame.image.save(self.compose_surface, filename)
+        super(ThreeCircles, self).__init__(
+            "ThreeCircles", circles, COLORS,
+            headless=headless, width=width, height=height, bkg_color=bkg_color
+        )
 
 
 def collect_data(
