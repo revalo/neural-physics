@@ -10,8 +10,9 @@ class Circle(Entity):
 
         self.r = r
         self.mass = mass
+        self.shape = self._make_shape()
 
-    def get_shape(self):
+    def _make_shape(self):
         inertia = pymunk.moment_for_circle(self.mass, 0, self.r, (0, 0))
         body = pymunk.Body(self.mass, inertia)
         body.position = self.position
