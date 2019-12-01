@@ -32,7 +32,7 @@ class Rectangles(Scene):
         rects = [
             Rect(
                 position=(
-                    (rect_width + width - rect_width)/2.0 + random.randint(-X_VARIATION,X_VARIATION),
+                    width / 2 + random.randint(-X_VARIATION,X_VARIATION),
                     random.randint(rect_height, height - rect_height),
                 ),
                 velocity=(
