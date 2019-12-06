@@ -26,6 +26,7 @@ class ThreeCircles(object):
         self.world = World(width, height)
         self.width = width
         self.height = height
+        self.radius = radius
 
         self.circles = [
             Circle(

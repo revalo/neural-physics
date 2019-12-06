@@ -12,6 +12,9 @@ from experiments.npe.simulate import get_circle_state
 
 def configuration_to_position(x, y, width, height, radius):
     # Scale the position.
+    x = np.clip(x, 0, 1)
+    y = np.clip(y, 0, 1)
+
     x, y = x * width, y * height
 
     # Clamp to valid position.
@@ -20,7 +23,47 @@ def configuration_to_position(x, y, width, height, radius):
 
 def configuration_to_velocity(vx, vy):
     # Scale the velocity.
+    vx = np.clip(vx, 0, 1)
+    vy = np.clip(vy, 0, 1)
+
     return (vx * 2.0 - 1.0) * MAX_VELOCITY, (vy * 2.0 - 1.0) * MAX_VELOCITY
+
+
+def initialize_scene_from_configuration(scene, configuration):
+    for c_i, circle in enumerate(scene.circles):
+        x, y, vx, vy = configuration[c_i : c_i + 4]
+
+        circle.position = configuration_to_position(
+            x, y, scene.width, scene.height, scene.radius
+        )
+        circle.velocity = configuration_to_velocity(vx, vy)
+
+    # Buffer step to correct for collisions.
+    # TODO(shreyask): Maybe this is not needed and might harm the model.
+    scene.step()
+
+
+def make_training(actual_states):
+    num_scenes, num_circles, num_episodes, _ = actual_states.shape
+
+    current_state = actual_states[:, :, :2, :].reshape((num_scenes, num_circles, 4))
+
+    for focus_circle_index in range(num_circles):
+        context_indices = [i for i in range(num_circles) if i != focus_circle_index]
+
+        Xs = (
+            [current_state[:, focus_circle_index]]
+            + [current_state[:, context_index] for context_index in context_indices]
+            + [np.ones((num_scenes, 1), dtype=np.float32) for _ in context_indices]
+        )
+
+        targets = (
+            actual_states[:, focus_circle_index, 2]
+            - actual_states[:, focus_circle_index, 1]
+        ) * TARGET_FPS
+
+        # TODO(shreyask): Could be tasteful and select a different focus circle.
+        return Xs, targets
 
 
 class Environment(object):
@@ -65,21 +108,9 @@ class Environment(object):
         num_circles = len(self.scenes[0].circles)
 
         # Initialize scenes with initial velocities and positions from configs.
-        print("Scene Setup.")
         for s_i, scene in enumerate(self.scenes):
             configuration = configurations[s_i]
-
-            for c_i, circle in enumerate(scene.circles):
-                x, y, vx, vy = configuration[c_i : c_i + 4]
-
-                circle.position = configuration_to_position(
-                    x, y, self.width, self.height, self.radius
-                )
-                circle.velocity = configuration_to_velocity(vx, vy)
-
-            # Buffer step to correct for collisions.
-            # TODO(shreyask): Maybe this is not needed and might harm the model.
-            scene.step()
+            initialize_scene_from_configuration(scene, configuration)
 
         # Generate trajectories.
 
@@ -98,7 +129,6 @@ class Environment(object):
         errors = []
 
         # Run simulations.
-        print("Generate simulations.")
         for episode in range(self.episodes):
             for s_i, scene in enumerate(self.scenes):
                 scene.step()
@@ -107,7 +137,6 @@ class Environment(object):
                     actual_states[s_i, c_i, episode] = get_circle_state(scene, circle)
 
         # Make model predictions.
-        print("Make predictions.")
         for episode in range(self.past_timesteps, self.episodes):
             current_state = actual_states[
                 :, :, episode - self.past_timesteps : episode, :
@@ -140,9 +169,10 @@ class Environment(object):
 
                 mse = np.linalg.norm(
                     actual_states[:, focus_circle_index, episode]
-                    - predicted_states[:, focus_circle_index, episode]
+                    - predicted_states[:, focus_circle_index, episode],
+                    axis=1,
                 )
 
                 errors.append(mse)
 
-        return np.mean(errors), actual_states, predicted_states
+        return np.mean(np.array(errors), axis=0), actual_states, predicted_states
