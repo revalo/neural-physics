@@ -46,7 +46,7 @@ class Rectangles(Scene):
         ]
 
         super(Rectangles, self).__init__(
-            "SixRectangles", rects, COLORS, headless=headless,
+            "BlockTower", rects, COLORS, headless=headless,
             width=width, height=height, gravity=(0, 9.8), wall_elasticity=0.8,
             bkg_color=bkg_color
         )
