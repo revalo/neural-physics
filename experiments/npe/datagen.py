@@ -34,6 +34,7 @@ def collect_data(
     y = []
 
     for sequence in tqdm.tqdm(range(num_sequences)):
+        # TODO(ayue): Enable scene picking.
         scene = threecircles.ThreeCircles(
             headless=True, width=width, height=width, radius=radius
         )

@@ -16,6 +16,7 @@ def get_input(state, past_steps):
 
 
 def show_simulation(model, width=256, height=256, radius=30, length=500, past_steps=2):
+    # TODO(ayue): Enable scene picking.
     scene = ThreeCircles(headless=False, width=width, height=height, radius=radius)
 
     # Buffer steps

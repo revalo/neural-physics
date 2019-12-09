@@ -5,8 +5,11 @@ import tensorflow as tf
 from absl import app
 from absl import flags
 
+# Environments
 from renderer.threecircles import ThreeCircles
+from renderer.rectangles import Rectangles
 
+# NPE-related
 from experiments.npe.datagen import collect_data
 from experiments.npe.simulate import show_simulation
 from experiments.npe.train import start_train
@@ -21,7 +24,6 @@ flags.DEFINE_boolean(
 )
 flags.DEFINE_boolean("model_simulation", False, "Show steps of the model.")
 
-flags.DEFINE_integer("radius", 30, "The radius of the balls.")
 flags.DEFINE_integer("simulation_steps", 1000, "Number of steps to simulate.")
 flags.DEFINE_integer("epochs", 100, "Number training epochs.")
 flags.DEFINE_integer("batch_size", 50, "Training batch size.")
@@ -32,12 +34,25 @@ flags.DEFINE_integer("sequence_len", 100, "Number of frames per sequence.")
 flags.DEFINE_float(
     "validation_split", 0.1, "Fraction of the sequences reserved for validation."
 )
+flags.DEFINE_string("scene", "ThreeCircles", "Scene to use. Options are ThreeCircles, BlockTower.")
+
+# Scene specific flags
+flags.DEFINE_integer("radius", 30, "The radius of the balls.")
 
 flags.mark_bool_flags_as_mutual_exclusive(
     ["gen_data", "show_world", "model_simulation", "train"],
     required=True,
     flag_values=FLAGS,
 )
+
+
+def create_scene():
+    if FLAGS.scene == "ThreeCircles":
+        return ThreeCircles(headless=False, radius=FLAGS.radius)
+    elif FLAGS.scene == "BlockTower":
+        return Rectangles(headless=False)
+    else:
+        raise ValueError("Please specify a valid scene.")
 
 
 def generate_data():
@@ -72,7 +87,7 @@ def generate_data():
 
 
 def show_world():
-    scene = ThreeCircles(headless=False, radius=FLAGS.radius)
+    scene = create_scene()
 
     for frame in range(FLAGS.simulation_steps):
         scene.step()
