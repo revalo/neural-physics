@@ -2,7 +2,7 @@ from renderer.threecircles import ThreeCircles
 from renderer.rectangles import Rectangles
 
 if __name__ == "__main__":
-    scene = Rectangles(headless=False)
+    scene = Rectangles(headless=False, rand_height=True)
 
     for frame in range(1000):
         scene.step()

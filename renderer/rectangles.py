@@ -27,13 +27,13 @@ X_VARIATION = 5
 
 class Rectangles(Scene):
     # position is the center of the box
-    def __init__(self, headless=True, width=256, height=256,
+    def __init__(self, headless=True, rand_height=True, width=256, height=256,
                  rect_height=20, rect_width=20, bkg_color=BACKGROUND):
         rects = [
             Rect(
                 position=(
-                    width / 2 + random.randint(-X_VARIATION,X_VARIATION),
-                    random.randint(rect_height, height - rect_height),
+                    (width)/2.0 + random.randint(-X_VARIATION,X_VARIATION),
+                    random.randint(rect_height, height - rect_height) if rand_height else height - (i+1) * rect_height,
                 ),
                 velocity=(
                     random.randint(0,0),
@@ -42,7 +42,7 @@ class Rectangles(Scene):
                 height=rect_height,
                 width=rect_width,
             )
-            for _ in range(NUM_RECTANGLES)
+            for i in range(NUM_RECTANGLES)
         ]
 
         super(Rectangles, self).__init__(
