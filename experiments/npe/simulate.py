@@ -23,22 +23,22 @@ def show_simulation(model, width=256, height=256, radius=30, length=500, past_st
     scene.step()
     scene.step()
 
-    states = [[] for _ in scene.circles]
+    states = [[] for _ in scene.objects]
 
     for _ in range(10):
         scene.step()
 
-        for i, circle in enumerate(scene.circles):
+        for i, circle in enumerate(scene.objects):
             states[i].append(get_circle_state(scene, circle))
 
     for frame in range(length):
         current_inputs = [get_input(state, past_steps) for state in states]
 
-        for i, key_circle in enumerate(scene.circles):
+        for i, key_circle in enumerate(scene.objects):
             key_input = current_inputs[i]
             context_inputs = [
                 current_inputs[i]
-                for i, circle in enumerate(scene.circles)
+                for i, circle in enumerate(scene.objects)
                 if circle != key_circle
             ]
 
@@ -54,7 +54,7 @@ def show_simulation(model, width=256, height=256, radius=30, length=500, past_st
 
             states[i].append(states[i][-1] + delta / TARGET_FPS)
 
-        for i, circle in enumerate(scene.circles):
+        for i, circle in enumerate(scene.objects):
             circle.position = (states[i][-1][0] * width, states[i][-1][1] * height)
 
         scene.draw()

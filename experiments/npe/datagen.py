@@ -40,10 +40,10 @@ def collect_data(
         )
 
         # TODO(shreyask): Think about velocity Box2D multiplier.
-        key_circle = random.choice(scene.circles)
-        context_circles = [circle for circle in scene.circles if circle != key_circle]
+        key_circle = random.choice(scene.objects)
+        context_circles = [circle for circle in scene.objects if circle != key_circle]
 
-        assert len(context_circles) < len(scene.circles)
+        assert len(context_circles) < len(scene.objects)
 
         for frame in range(sequence_length):
             # Calculate setup.
