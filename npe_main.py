@@ -10,9 +10,9 @@ from renderer.threecircles import ThreeCircles
 from renderer.rectangles import Rectangles
 
 # NPE-related
-from experiments.npe.datagen import collect_data
-from experiments.npe.simulate import show_simulation
-from experiments.npe.train import start_train
+from experiments.npe_bt.datagen import collect_data
+from experiments.npe_bt.simulate import show_simulation
+from experiments.npe_bt.train import start_train
 
 import pickle
 

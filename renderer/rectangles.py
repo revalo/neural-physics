@@ -23,7 +23,7 @@ MAX_VELOCITY = 150
 
 NUM_RECTANGLES = 6
 
-X_VARIATION = 5
+X_VARIATION = 10
 
 class Rectangles(Scene):
     # position is the center of the box
@@ -33,7 +33,7 @@ class Rectangles(Scene):
             Rect(
                 position=(
                     (width)/2.0 + random.randint(-X_VARIATION,X_VARIATION),
-                    random.randint(rect_height, height - rect_height) if rand_height else height - (i+1) * rect_height,
+                    random.randint(rect_height, height - rect_height) if rand_height else height - (i+0.5) * rect_height,
                 ),
                 velocity=(
                     random.randint(0,0),
