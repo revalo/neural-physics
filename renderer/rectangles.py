@@ -27,7 +27,7 @@ X_VARIATION = 10
 
 class Rectangles(Scene):
     # position is the center of the box
-    def __init__(self, headless=True, rand_height=True, width=256, height=256,
+    def __init__(self, headless=True, rand_height=True, width=256, height=256, wall_elasticity=0.8,
                  rect_height=20, rect_width=20, bkg_color=BACKGROUND):
         rects = [
             Rect(
@@ -47,7 +47,7 @@ class Rectangles(Scene):
 
         super(Rectangles, self).__init__(
             "BlockTower", rects, COLORS, headless=headless,
-            width=width, height=height, gravity=(0, 9.8), wall_elasticity=0.8,
+            width=width, height=height, gravity=(0, 9.8), wall_elasticity=wall_elasticity,
             bkg_color=bkg_color
         )
 
