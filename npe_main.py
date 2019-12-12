@@ -50,7 +50,7 @@ def create_scene():
     if FLAGS.scene == "ThreeCircles":
         return ThreeCircles(headless=False, radius=FLAGS.radius)
     elif FLAGS.scene == "BlockTower":
-        return Rectangles(headless=False)
+        return Rectangles(headless=False, rand_height=False, wall_elasticity=1.0)
     else:
         raise ValueError("Please specify a valid scene.")
 

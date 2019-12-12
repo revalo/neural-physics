@@ -7,7 +7,7 @@ import numpy as np
 import math
 
 from renderer.constants import TARGET_FPS
-import renderer.rectangles as rectangles
+from renderer.rectangles import Rectangles
 
 def normalize_position(position, angle, width, height):
     x, y = position
@@ -15,7 +15,7 @@ def normalize_position(position, angle, width, height):
     return (
         x / width,
         y / height,
-        angle / (2 * math.pi), #maybe it's pi?
+        angle / (2 * math.pi), # maybe it's pi?
     )
 
 
@@ -36,8 +36,8 @@ def collect_data(
 
     for sequence in tqdm.tqdm(range(num_sequences)):
         # TODO(ayue): Enable scene picking.
-        scene = rectangles.Rectangles(
-            headless=True, rand_height=False
+        scene = Rectangles(
+            headless=True, rand_height=False, wall_elasticity=1.0
         )
 
         # TODO(shreyask): Think about velocity Box2D multiplier.
@@ -78,7 +78,7 @@ def collect_data(
             next_position = normalize_position(key_circle.position, key_circle.shape.body.angle, width, height)
 
             # Final state is the velocity.
-            final_state = TARGET_FPS * (
+            final_state = 1000.0 * (
                 np.array(next_position) - np.array(prev_position)
             )
 
@@ -89,4 +89,6 @@ def collect_data(
 
 
 if __name__ == "__main__":
-    X, y = collect_data()
+    X, y = collect_data(num_sequences=1, seed=1337)
+    print(X[0])
+    print(y[0])

@@ -51,6 +51,8 @@ def show_simulation(model, width=256, height=256, radius=30, length=500, past_st
                     np.array([context_inputs[2]]),
                     np.array([context_inputs[3]]),
                     np.array([context_inputs[4]]),
+                    # Factor for the edge weights of the corresponding context object.
+                    # 0 if no object, 1 if object with full importance.
                     np.array([[1.0]]),
                     np.array([[1.0]]),
                     np.array([[1.0]]),
@@ -58,8 +60,8 @@ def show_simulation(model, width=256, height=256, radius=30, length=500, past_st
                     np.array([[1.0]]),
                 ]
             )[0]
-
-            states[i].append(states[i][-1] + delta / TARGET_FPS)
+            print(delta)                            
+            states[i].append(states[i][-1] + delta / 1000.0)
 
         for i, circle in enumerate(scene.objects):
             circle.position = (states[i][-1][0] * width, states[i][-1][1] * height)
