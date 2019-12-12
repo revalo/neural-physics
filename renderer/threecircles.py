@@ -2,6 +2,7 @@ import pygame
 import random
 import os
 import tqdm
+import pymunk
 
 from renderer.constants import TARGET_FPS
 
@@ -23,7 +24,7 @@ MAX_VELOCITY = 150
 class ThreeCircles(object):
     def __init__(self, headless=True, width=256, height=256, radius=20):
         self.headless = headless
-        self.world = World(width, height)
+        self.world = World(width, height, wall_elasticity=1.0)
         self.width = width
         self.height = height
         self.radius = radius
@@ -46,6 +47,13 @@ class ThreeCircles(object):
         for circle in self.circles:
             self.world.add_entity(circle)
 
+        # Collision handler.
+        self.collision_handler = self.world.space.add_default_collision_handler()
+        self.collision_handler.begin = self.handle_collison
+
+        self.circle_circle = 0
+        self.circle_wall = 0
+
         pygame.init()
         pygame.display.set_caption("ThreeCircles")
 
@@ -59,6 +67,24 @@ class ThreeCircles(object):
         ]
 
         self.clock = pygame.time.Clock()
+
+    def handle_collison(self, arbiter, space, data):
+        circles = len(
+            [s for s in arbiter.shapes if isinstance(s, pymunk.shapes.Circle)]
+        )
+        walls = len([s for s in arbiter.shapes if isinstance(s, pymunk.shapes.Poly)])
+
+        if circles == 2:
+            self.circle_circle += 1
+
+        if circles == 1 and walls == 1:
+            self.circle_wall += 1
+
+        return True
+
+    def reset_collision_counters(self):
+        self.circle_circle = 0
+        self.circle_wall = 0
 
     def step(self):
         self.world.step(1.0 / TARGET_FPS)
