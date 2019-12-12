@@ -20,13 +20,13 @@ class World(object):
         self.id_counter = 0
 
         # Add invisible walls at edges.
-        self.add_entity(Wall((-5, self.height / 2), 10, self.height, self.elasticity))
+        self.add_entity(Wall((-5, self.height / 2), 10, self.height, wall_elasticity))
         self.add_entity(
-            Wall((self.width + 5, self.height / 2), 10, self.height, self.elasticity)
+            Wall((self.width + 5, self.height / 2), 10, self.height, wall_elasticity)
         )
-        self.add_entity(Wall((self.width / 2, -5), self.width, 10, self.elasticity))
+        self.add_entity(Wall((self.width / 2, -5), self.width, 10, wall_elasticity))
         self.add_entity(
-            Wall((self.width / 2, self.height + 5), self.width, 10, self.elasticity)
+            Wall((self.width / 2, self.height + 5), self.width, 10, wall_elasticity)
         )
 
     def add_entity(self, entity):
