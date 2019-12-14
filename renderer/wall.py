@@ -6,7 +6,7 @@ from renderer.entity import Entity
 
 class Wall(Entity):
     def __init__(self, position, w, h, elasticity):
-        super(Wall, self).__init__(position, (0, 0))
+        super().__init__(position, (0, 0))
         self.w = w
         self.h = h
         self.elasticity = elasticity

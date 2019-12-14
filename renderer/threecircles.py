@@ -1,10 +1,10 @@
-import pygame
 import random
 import os
 import tqdm
 import pymunk
+import pygame
 
-from renderer.constants import TARGET_FPS
+from renderer.constants import TARGET_FPS, MAX_VELOCITY
 
 from renderer.world import World
 from renderer.circle import Circle
@@ -16,13 +16,12 @@ COLORS = [
     (255, 0, 0),
     (0, 255, 0),
     (0, 0, 255),
+    (255, 0, 255),
 ]
-
-MAX_VELOCITY = 150
 
 
 class ThreeCircles(object):
-    def __init__(self, headless=True, width=256, height=256, radius=20):
+    def __init__(self, headless=True, width=256, height=256, radius=30):
         self.headless = headless
         self.world = World(width, height, wall_elasticity=1.0)
         self.width = width
@@ -54,19 +53,18 @@ class ThreeCircles(object):
         self.circle_circle = 0
         self.circle_wall = 0
 
-        pygame.init()
-        pygame.display.set_caption("ThreeCircles")
-
         if not self.headless:
+
+            pygame.init()
+            pygame.display.set_caption("ThreeCircles")
             self.screen = pygame.display.set_mode((width, height))
 
-        self.compose_surface = pygame.Surface((width, height))
-        self.binary_surface = pygame.Surface((width, height))
-        self.circle_surfaces = [
-            pygame.Surface((width, height)) for circle in self.circles
-        ]
-
-        self.clock = pygame.time.Clock()
+            self.compose_surface = pygame.Surface((width, height))
+            self.binary_surface = pygame.Surface((width, height))
+            self.circle_surfaces = [
+                pygame.Surface((width, height)) for circle in self.circles
+            ]
+            self.clock = pygame.time.Clock()
 
     def handle_collison(self, arbiter, space, data):
         circles = len(
@@ -105,6 +103,14 @@ class ThreeCircles(object):
             self.screen.blit(self.compose_surface, (0, 0))
             pygame.display.flip()
             self.clock.tick(TARGET_FPS)
+
+    def draw_trails(self):
+        for i, circle in enumerate(self.circles):
+            circle.draw_trail(self.compose_surface)
+
+        if not self.headless:
+            self.screen.blit(self.compose_surface, (0, 0))
+            pygame.display.flip()
 
     def save_image(self, filename):
         pygame.image.save(self.compose_surface, filename)
