@@ -1,6 +1,7 @@
 """Main endpoint for working with the NPE engine."""
 
 import tensorflow as tf
+import numpy as np
 
 from absl import app
 from absl import flags
@@ -11,7 +12,7 @@ from experiments.npe.datagen import collect_data
 from experiments.npe.simulate import show_simulation
 from experiments.npe.train import start_train
 
-import pickle
+import h5py
 
 FLAGS = flags.FLAGS
 flags.DEFINE_boolean("gen_data", False, "Generate data.", short_name="g")
@@ -23,12 +24,12 @@ flags.DEFINE_boolean("model_simulation", False, "Show steps of the model.")
 
 flags.DEFINE_integer("radius", 30, "The radius of the balls.")
 flags.DEFINE_integer("simulation_steps", 1000, "Number of steps to simulate.")
-flags.DEFINE_integer("epochs", 100, "Number training epochs.")
+flags.DEFINE_integer("epochs", 20, "Number training epochs.")
 flags.DEFINE_integer("batch_size", 50, "Training batch size.")
 flags.DEFINE_string("dataset", None, "Path to dataset pickle file.")
 flags.DEFINE_string("model", None, "Path to saved model weights.")
-flags.DEFINE_integer("num_sequences", 1000, "Number of sequences to generate.")
-flags.DEFINE_integer("sequence_len", 100, "Number of frames per sequence.")
+flags.DEFINE_integer("num_sequences", 50000, "Number of sequences to generate.")
+flags.DEFINE_integer("sequence_len", 60, "Number of frames per sequence.")
 flags.DEFINE_float(
     "validation_split", 0.1, "Fraction of the sequences reserved for validation."
 )
@@ -54,21 +55,27 @@ def generate_data():
 
     validation_sequences = int(FLAGS.num_sequences * FLAGS.validation_split)
 
-    train_x, train_y = collect_data(
+    train_x, train_y, train_complexities = collect_data(
         num_sequences=FLAGS.num_sequences,
         sequence_length=FLAGS.sequence_len,
         radius=FLAGS.radius,
         seed=1337,
     )
-    val_x, val_y = collect_data(
+    val_x, val_y, _ = collect_data(
         num_sequences=validation_sequences,
         sequence_length=FLAGS.sequence_len,
         radius=FLAGS.radius,
         seed=5332,
     )
 
-    with open(FLAGS.dataset, "wb") as f:
-        pickle.dump({"train": (train_x, train_y), "val": (val_x, val_y)}, f)
+    from experiments.npe.train import breakdown
+
+    print("Breaking down!")
+    btrain_x = breakdown(train_x)
+    bval_x = breakdown(val_x)
+
+    print("Saving!")
+    np.savez(FLAGS.dataset, *btrain_x, *bval_x, train_y=train_y, val_y=val_y)
 
 
 def show_world():
