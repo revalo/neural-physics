@@ -1,9 +1,10 @@
-import pygame
 import random
 import os
 import tqdm
+import pymunk
+import pygame
 
-from renderer.constants import TARGET_FPS, BACKGROUND
+from renderer.constants import TARGET_FPS, BACKGROUND, MAX_VELOCITY
 
 from renderer.world import World
 from renderer.scene import Scene
@@ -14,14 +15,19 @@ COLORS = [
     (255, 0, 0),
     (0, 255, 0),
     (0, 0, 255),
+    (255, 0, 255),
 ]
 
-MAX_VELOCITY = 150
 
+class ThreeCircles(object):
+    def __init__(self, headless=True, width=256, height=256, radius=30):
+        self.headless = headless
+        self.world = World(width, height, wall_elasticity=1.0, wall_friction=0.0)
+        self.width = width
+        self.height = height
+        self.radius = radius
 
-class ThreeCircles(Scene):
-    def __init__(self, headless=True, width=256, height=256, radius=20, bkg_color=BACKGROUND):
-        circles = [
+        self.circles = [
             Circle(
                 position=(
                     random.randint(radius, width - radius),
@@ -36,10 +42,77 @@ class ThreeCircles(Scene):
             for _ in range(3)
         ]
 
-        super(ThreeCircles, self).__init__(
-            "ThreeCircles", circles, COLORS,
-            headless=headless, width=width, height=height, bkg_color=bkg_color
+        for circle in self.circles:
+            self.world.add_entity(circle)
+
+        # Collision handler.
+        self.collision_handler = self.world.space.add_default_collision_handler()
+        self.collision_handler.begin = self.handle_collison
+
+        self.circle_circle = 0
+        self.circle_wall = 0
+
+        if not self.headless:
+
+            pygame.init()
+            pygame.display.set_caption("ThreeCircles")
+            self.screen = pygame.display.set_mode((width, height))
+
+            self.compose_surface = pygame.Surface((width, height))
+            self.binary_surface = pygame.Surface((width, height))
+            self.circle_surfaces = [
+                pygame.Surface((width, height)) for circle in self.circles
+            ]
+            self.clock = pygame.time.Clock()
+
+    def handle_collison(self, arbiter, space, data):
+        circles = len(
+            [s for s in arbiter.shapes if isinstance(s, pymunk.shapes.Circle)]
         )
+        walls = len([s for s in arbiter.shapes if isinstance(s, pymunk.shapes.Poly)])
+
+        if circles == 2:
+            self.circle_circle += 1
+
+        if circles == 1 and walls == 1:
+            self.circle_wall += 1
+
+        return True
+
+    def reset_collision_counters(self):
+        self.circle_circle = 0
+        self.circle_wall = 0
+
+    def step(self):
+        self.world.step(1.0 / TARGET_FPS)
+
+    def draw(self):
+        self.compose_surface.fill(BACKGROUND)
+        self.binary_surface.fill((0, 0, 0))
+
+        for i, circle in enumerate(self.circles):
+            circle.draw(self.compose_surface, COLORS[i])
+            circle.draw(self.binary_surface, (255, 255, 255))
+
+            # Generate binary masked circle image.
+            self.circle_surfaces[i].fill((0, 0, 0))
+            circle.draw(self.circle_surfaces[i], (255, 255, 255))
+
+        if not self.headless:
+            self.screen.blit(self.compose_surface, (0, 0))
+            pygame.display.flip()
+            self.clock.tick(TARGET_FPS)
+
+    def draw_trails(self):
+        for i, circle in enumerate(self.circles):
+            circle.draw_trail(self.compose_surface)
+
+        if not self.headless:
+            self.screen.blit(self.compose_surface, (0, 0))
+            pygame.display.flip()
+
+    def save_image(self, filename):
+        pygame.image.save(self.compose_surface, filename)
 
 
 def collect_data(
