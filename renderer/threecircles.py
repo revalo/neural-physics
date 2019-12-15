@@ -9,6 +9,7 @@ from renderer.constants import TARGET_FPS, BACKGROUND, MAX_VELOCITY
 from renderer.world import World
 from renderer.scene import Scene
 from renderer.circle import Circle
+from renderer.rect import Rect
 from renderer.wall import Wall
 
 COLORS = [
@@ -28,7 +29,18 @@ class ThreeCircles(object):
         self.radius = radius
 
         self.circles = [
-            Circle(
+            # Circle(
+            #     position=(
+            #         random.randint(radius, width - radius),
+            #         random.randint(radius, height - radius),
+            #     ),
+            #     velocity=(
+            #         random.randint(-MAX_VELOCITY, MAX_VELOCITY),
+            #         random.randint(-MAX_VELOCITY, MAX_VELOCITY),
+            #     ),
+            #     r=radius,
+            # )
+            Rect(
                 position=(
                     random.randint(radius, width - radius),
                     random.randint(radius, height - radius),
@@ -37,13 +49,17 @@ class ThreeCircles(object):
                     random.randint(-MAX_VELOCITY, MAX_VELOCITY),
                     random.randint(-MAX_VELOCITY, MAX_VELOCITY),
                 ),
-                r=radius,
+                width=int(radius * 2),
+                height=int(radius * 2),
             )
             for _ in range(3)
         ]
 
+        self.objects = []
+
         for circle in self.circles:
             self.world.add_entity(circle)
+            self.objects.append(circle)
 
         # Collision handler.
         self.collision_handler = self.world.space.add_default_collision_handler()

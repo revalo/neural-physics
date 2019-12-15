@@ -72,13 +72,13 @@ def generate_data():
 
     validation_sequences = int(FLAGS.num_sequences * FLAGS.validation_split)
 
-    train_x, train_y, train_complexities = collect_data(
+    train_x, train_y = collect_data(
         num_sequences=FLAGS.num_sequences,
         sequence_length=FLAGS.sequence_len,
         radius=FLAGS.radius,
         seed=1337,
     )
-    val_x, val_y, _ = collect_data(
+    val_x, val_y = collect_data(
         num_sequences=validation_sequences,
         sequence_length=FLAGS.sequence_len,
         radius=FLAGS.radius,
@@ -90,13 +90,26 @@ def generate_data():
     bval_x = breakdown(val_x)
 
     print("Saving!")
-    np.savez(FLAGS.dataset, *btrain_x, *bval_x, train_y=train_y, val_y=val_y)
+    np.savez(
+        FLAGS.dataset,
+        *btrain_x,
+        *bval_x,
+        train_y=train_y,
+        val_y=val_y,
+        config={
+            "scene": FLAGS.scene,
+            "num_sequences": FLAGS.num_sequences,
+            "sequence_len": FLAGS.sequence_len,
+            "num_objects": (len(btrain_x) - 1) // 2 + 1,
+        }
+    )
 
 
 def show_world():
     scene = create_scene()
 
     for frame in range(FLAGS.simulation_steps):
+        print(frame)
         scene.step()
         scene.draw()
 

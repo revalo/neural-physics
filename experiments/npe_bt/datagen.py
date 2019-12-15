@@ -8,6 +8,7 @@ import math
 
 from renderer.constants import TARGET_FPS, MAX_VELOCITY, MAX_ANGULAR_VELOCITY
 from renderer.rectangles import Rectangles
+from renderer.threecircles import ThreeCircles
 
 
 def normalize_state(position, velocity, angle, angular_velocity, width, height):
@@ -19,7 +20,7 @@ def normalize_state(position, velocity, angle, angular_velocity, width, height):
         y / height,
         vx / MAX_VELOCITY,
         vy / MAX_VELOCITY,
-        angle / (2 * math.pi),  # maybe it's pi?
+        angle / np.pi,  # maybe it's pi?
         angular_velocity / MAX_ANGULAR_VELOCITY,
     )
 
@@ -42,6 +43,7 @@ def collect_data(
     for sequence in tqdm.tqdm(range(num_sequences)):
         # TODO(ayue): Enable scene picking.
         scene = Rectangles(headless=True, rand_height=False, wall_elasticity=1.0)
+        # scene = ThreeCircles(headless=True, width=width, height=height, radius=radius)
 
         # TODO(shreyask): Think about velocity Box2D multiplier.
         key_object = random.choice(scene.objects)
@@ -52,7 +54,7 @@ def collect_data(
         for frame in range(sequence_length):
             # Calculate setup.
             key_state = []
-            context_states = [[] for _ in range(max_pairs)]
+            context_states = [[] for _ in range(len(scene.objects) - 1)]
 
             used = []
 
@@ -83,7 +85,7 @@ def collect_data(
                     )
 
                     if step == history - 1:
-                        used.append(np.array[[1.0]])
+                        used.append(np.array([1.0]))
 
             key_state = np.array(key_state)
             for i in range(len(context_states)):
@@ -99,7 +101,7 @@ def collect_data(
                 height,
             )
             scene.step()
-            _, _, n_vx, n_vy, _, n_av = next_state = normalize_state(
+            _, _, n_vx, n_vy, _, n_av = normalize_state(
                 key_object.position,
                 key_object.velocity,
                 key_object.shape.body.angle,

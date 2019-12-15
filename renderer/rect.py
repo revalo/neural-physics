@@ -7,7 +7,7 @@ from renderer.entity import Entity
 class Rect(Entity):
     # position refers to the center of the box
     def __init__(self, position, velocity, height, width, mass=10):
-        super(Rect, self).__init__(position, velocity)
+        super().__init__(position, velocity)
         self.mass = mass
         self.height = height
         self.width = width
@@ -20,8 +20,8 @@ class Rect(Entity):
         """
         vertices = []
         for v in self.shape.get_vertices():
-            x,y = v.rotated(self.shape.body.angle) + self.shape.body.position
-            vertices.append((x,y))
+            x, y = v.rotated(self.shape.body.angle) + self.position
+            vertices.append((x, y))
         return vertices
 
     def _make_shape(self):
@@ -30,8 +30,10 @@ class Rect(Entity):
         body.position = self.position
 
         shape = pymunk.Poly.create_box(body, size=(self.width, self.height))
-        shape.elasticity = 0.5
-        shape.friction = 0.4
+        # shape.elasticity = 0.5
+        # shape.friction = 0.4
+        shape.elasticity = 1.0
+        shape.friction = 0.0
 
         return shape
 

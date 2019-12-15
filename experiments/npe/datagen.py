@@ -65,7 +65,7 @@ def collect_data(
         key_circle = random.choice(scene.circles)
         context_circles = [circle for circle in scene.circles if circle != key_circle]
 
-        assert len(context_circles) < len(scene.objects)
+        assert len(context_circles) < len(scene.circles)
 
         for frame in range(sequence_length):
             # Calculate setup.
@@ -114,7 +114,7 @@ def collect_data(
             y.append(final_state)
             complexities.append(get_complexity(scene.circle_circle, scene.circle_wall))
 
-    return X, y, complexities
+    return X, y
 
 
 if __name__ == "__main__":
