@@ -8,6 +8,10 @@ import random
 from experiments.npe.model import get_npe_model
 
 
+def breakdown(X):
+    return [np.array([x[i] for x in X]) for i in range(len(X[0]))]
+
+
 def start_train(dataset, model_save, epochs=20, batch_size=50):
     data = np.load(dataset)
 

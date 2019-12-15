@@ -11,6 +11,7 @@ from renderer.threecircles import ThreeCircles
 from renderer.rectangles import Rectangles
 
 # NPE-related
+from experiments.npe.train import breakdown
 from experiments.npe_bt.datagen import collect_data
 from experiments.npe_bt.simulate import show_simulation
 from experiments.npe_bt.train import start_train
@@ -83,8 +84,6 @@ def generate_data():
         radius=FLAGS.radius,
         seed=5332,
     )
-
-    from experiments.npe.train import breakdown
 
     print("Breaking down!")
     btrain_x = breakdown(train_x)

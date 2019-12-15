@@ -4,12 +4,16 @@
 import math
 import numpy as np
 from renderer.rectangles import Rectangles
-from experiments.npe_bt.datagen import normalize_position
+from experiments.npe_bt.datagen import normalize_state
 from renderer.constants import TARGET_FPS
 
 
 def get_circle_state(scene, circle):
-    return np.array(normalize_position(circle.position, circle.shape.body.angle, scene.width, scene.height))
+    return np.array(
+        normalize_state(
+            circle.position, circle.shape.body.angle, scene.width, scene.height
+        )
+    )
 
 
 def get_input(state, past_steps):
@@ -60,7 +64,7 @@ def show_simulation(model, width=256, height=256, radius=30, length=500, past_st
                     np.array([[1.0]]),
                 ]
             )[0]
-            print(delta)                            
+            print(delta)
             states[i].append(states[i][-1] + delta / 1000.0)
 
         for i, circle in enumerate(scene.objects):

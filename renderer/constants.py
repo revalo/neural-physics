@@ -1,3 +1,6 @@
+import numpy as np
+
 TARGET_FPS = 10.0
 BACKGROUND = (255, 255, 255)
 MAX_VELOCITY = 150
+MAX_ANGULAR_VELOCITY = 2 * np.pi

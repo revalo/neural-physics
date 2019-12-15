@@ -6,16 +6,21 @@ import random
 import numpy as np
 import math
 
-from renderer.constants import TARGET_FPS
+from renderer.constants import TARGET_FPS, MAX_VELOCITY, MAX_ANGULAR_VELOCITY
 from renderer.rectangles import Rectangles
 
-def normalize_position(position, angle, width, height):
+
+def normalize_state(position, velocity, angle, angular_velocity, width, height):
     x, y = position
+    vx, vy = velocity
 
     return (
         x / width,
         y / height,
-        angle / (2 * math.pi), # maybe it's pi?
+        vx / MAX_VELOCITY,
+        vy / MAX_VELOCITY,
+        angle / (2 * math.pi),  # maybe it's pi?
+        angular_velocity / MAX_ANGULAR_VELOCITY,
     )
 
 
@@ -36,51 +41,78 @@ def collect_data(
 
     for sequence in tqdm.tqdm(range(num_sequences)):
         # TODO(ayue): Enable scene picking.
-        scene = Rectangles(
-            headless=True, rand_height=False, wall_elasticity=1.0
-        )
+        scene = Rectangles(headless=True, rand_height=False, wall_elasticity=1.0)
 
         # TODO(shreyask): Think about velocity Box2D multiplier.
-        key_circle = random.choice(scene.objects)
-        context_circles = [circle for circle in scene.objects if circle != key_circle]
+        key_object = random.choice(scene.objects)
+        context_objects = [obj for obj in scene.objects if obj != key_object]
 
-        assert len(context_circles) < len(scene.objects)
+        assert len(context_objects) < len(scene.objects)
 
         for frame in range(sequence_length):
             # Calculate setup.
             key_state = []
             context_states = [[] for _ in range(max_pairs)]
 
-            used = [np.array([1.0]) for _ in range(len(context_circles))] + [
-                np.array([0.0]) for _ in range(max_pairs - len(context_circles))
-            ]
+            used = []
 
             for step in range(history):
                 scene.step()
 
-                key_state.extend(normalize_position(key_circle.position, key_circle.shape.body.angle, width, height))
+                key_state.extend(
+                    normalize_state(
+                        key_object.position,
+                        key_object.velocity,
+                        key_object.shape.body.angle,
+                        key_object.shape.body.angular_velocity,
+                        width,
+                        height,
+                    )
+                )
 
-                for i, circle in enumerate(context_circles):
+                for i, obj in enumerate(context_objects):
                     context_states[i].extend(
-                        normalize_position(circle.position, circle.shape.body.angle, width, height)
+                        normalize_state(
+                            obj.position,
+                            obj.velocity,
+                            obj.shape.body.angle,
+                            obj.shape.body.angular_velocity,
+                            width,
+                            height,
+                        )
                     )
 
-                for i in range(len(context_circles), max_pairs):
-                    context_states[i].extend([0.0, 0.0])
+                    if step == history - 1:
+                        used.append(np.array[[1.0]])
 
             key_state = np.array(key_state)
             for i in range(len(context_states)):
                 context_states[i] = np.array(context_states[i])
 
             # Calculate answer.
-            prev_position = normalize_position(key_circle.position, key_circle.shape.body.angle, width, height)
-            scene.step()
-            next_position = normalize_position(key_circle.position, key_circle.shape.body.angle, width, height)
-
-            # Final state is the velocity.
-            final_state = 1000.0 * (
-                np.array(next_position) - np.array(prev_position)
+            _, _, p_vx, p_vy, _, p_av = normalize_state(
+                key_object.position,
+                key_object.velocity,
+                key_object.shape.body.angle,
+                key_object.shape.body.angular_velocity,
+                width,
+                height,
             )
+            scene.step()
+            _, _, n_vx, n_vy, _, n_av = next_state = normalize_state(
+                key_object.position,
+                key_object.velocity,
+                key_object.shape.body.angle,
+                key_object.shape.body.angular_velocity,
+                width,
+                height,
+            )
+
+            dv = np.array([n_vx, n_vy]) - np.array([p_vx, p_vy])
+            dav = np.array([n_av]) - np.array([p_av])
+
+            # Final state is the change in velocities.
+            final_state = np.hstack((dv, dav))
 
             X.append([key_state] + context_states + used)
             y.append(final_state)
