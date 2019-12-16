@@ -5,18 +5,20 @@ from renderer.entity import Entity
 
 
 class Wall(Entity):
-    def __init__(self, position, w, h, elasticity):
-        super().__init__(position, (0, 0))
+    def __init__(self, position, w, h, elasticity=0.8, friction=0.4):
+        super(Wall, self).__init__(position, (0, 0))
         self.w = w
         self.h = h
         self.elasticity = elasticity
+        self.friction = friction
+        self.shape = self._make_shape()
 
-    def get_shape(self):
+    def _make_shape(self):
         body = pymunk.Body(body_type=pymunk.Body.STATIC)
         body.position = self.position
 
         box = pymunk.Poly.create_box(body, size=(self.w, self.h))
-        box.friction = 0.0
+        box.friction = self.friction
         box.elasticity = self.elasticity
 
         return box

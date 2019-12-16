@@ -4,13 +4,13 @@ import tqdm
 import pymunk
 import pygame
 
-from renderer.constants import TARGET_FPS, MAX_VELOCITY
+from renderer.constants import TARGET_FPS, BACKGROUND, MAX_VELOCITY
 
 from renderer.world import World
+from renderer.scene import Scene
 from renderer.circle import Circle
+from renderer.rect import Rect
 from renderer.wall import Wall
-
-BACKGROUND = (255, 255, 255)
 
 COLORS = [
     (255, 0, 0),
@@ -23,13 +23,24 @@ COLORS = [
 class ThreeCircles(object):
     def __init__(self, headless=True, width=256, height=256, radius=30):
         self.headless = headless
-        self.world = World(width, height, wall_elasticity=1.0)
+        self.world = World(width, height, wall_elasticity=1.0, wall_friction=0.0)
         self.width = width
         self.height = height
         self.radius = radius
 
         self.circles = [
-            Circle(
+            # Circle(
+            #     position=(
+            #         random.randint(radius, width - radius),
+            #         random.randint(radius, height - radius),
+            #     ),
+            #     velocity=(
+            #         random.randint(-MAX_VELOCITY, MAX_VELOCITY),
+            #         random.randint(-MAX_VELOCITY, MAX_VELOCITY),
+            #     ),
+            #     r=radius,
+            # )
+            Rect(
                 position=(
                     random.randint(radius, width - radius),
                     random.randint(radius, height - radius),
@@ -38,13 +49,17 @@ class ThreeCircles(object):
                     random.randint(-MAX_VELOCITY, MAX_VELOCITY),
                     random.randint(-MAX_VELOCITY, MAX_VELOCITY),
                 ),
-                r=radius,
+                width=int(radius * 2),
+                height=int(radius * 2),
             )
             for _ in range(3)
         ]
 
+        self.objects = []
+
         for circle in self.circles:
             self.world.add_entity(circle)
+            self.objects.append(circle)
 
         # Collision handler.
         self.collision_handler = self.world.space.add_default_collision_handler()

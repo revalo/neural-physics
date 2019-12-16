@@ -53,7 +53,7 @@ def show_simulation(
     scene.step()
     scene.step()
 
-    states = [[] for _ in scene.circles]
+    states = [[] for _ in scene.objects]
 
     for _ in range(2):
         scene.step()
@@ -73,11 +73,11 @@ def show_simulation(
     for frame in range(length):
         current_inputs = [get_input(state, past_steps, scene) for state in states]
 
-        for i, key_circle in enumerate(scene.circles):
+        for i, key_circle in enumerate(scene.objects):
             key_input = current_inputs[i]
             context_inputs = [
                 current_inputs[i]
-                for i, circle in enumerate(scene.circles)
+                for i, circle in enumerate(scene.objects)
                 if circle != key_circle
             ]
 

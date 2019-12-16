@@ -57,6 +57,7 @@ def collect_data(
     complexities = []
 
     for sequence in tqdm.tqdm(range(num_sequences)):
+        # TODO(ayue): Enable scene picking.
         scene = threecircles.ThreeCircles(
             headless=True, width=width, height=height, radius=radius
         )
@@ -113,7 +114,7 @@ def collect_data(
             y.append(final_state)
             complexities.append(get_complexity(scene.circle_circle, scene.circle_wall))
 
-    return X, y, complexities
+    return X, y
 
 
 if __name__ == "__main__":

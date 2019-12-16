@@ -6,13 +6,16 @@ import numpy as np
 from absl import app
 from absl import flags
 
+# Environments
 from renderer.threecircles import ThreeCircles
+from renderer.rectangles import Rectangles
 
-from experiments.npe.datagen import collect_data
-from experiments.npe.simulate import show_simulation
-from experiments.npe.train import start_train
+# NPE-related
+from experiments.npe.train import breakdown
+from experiments.npe_bt.datagen import collect_data
+from experiments.npe_bt.simulate import show_simulation
+from experiments.npe_bt.train import start_train
 
-import h5py
 
 FLAGS = flags.FLAGS
 flags.DEFINE_boolean("gen_data", False, "Generate data.", short_name="g")
@@ -22,7 +25,6 @@ flags.DEFINE_boolean(
 )
 flags.DEFINE_boolean("model_simulation", False, "Show steps of the model.")
 
-flags.DEFINE_integer("radius", 30, "The radius of the balls.")
 flags.DEFINE_integer("simulation_steps", 1000, "Number of steps to simulate.")
 flags.DEFINE_integer("epochs", 20, "Number training epochs.")
 flags.DEFINE_integer("batch_size", 50, "Training batch size.")
@@ -33,12 +35,27 @@ flags.DEFINE_integer("sequence_len", 60, "Number of frames per sequence.")
 flags.DEFINE_float(
     "validation_split", 0.1, "Fraction of the sequences reserved for validation."
 )
+flags.DEFINE_string(
+    "scene", "ThreeCircles", "Scene to use. Options are ThreeCircles, BlockTower."
+)
+
+# Scene specific flags
+flags.DEFINE_integer("radius", 30, "The radius of the balls.")
 
 flags.mark_bool_flags_as_mutual_exclusive(
     ["gen_data", "show_world", "model_simulation", "train"],
     required=True,
     flag_values=FLAGS,
 )
+
+
+def create_scene():
+    if FLAGS.scene == "ThreeCircles":
+        return ThreeCircles(headless=False, radius=FLAGS.radius)
+    elif FLAGS.scene == "BlockTower":
+        return Rectangles(headless=False, rand_height=False, wall_elasticity=1.0)
+    else:
+        raise ValueError("Please specify a valid scene.")
 
 
 def generate_data():
@@ -55,33 +72,44 @@ def generate_data():
 
     validation_sequences = int(FLAGS.num_sequences * FLAGS.validation_split)
 
-    train_x, train_y, train_complexities = collect_data(
+    train_x, train_y = collect_data(
         num_sequences=FLAGS.num_sequences,
         sequence_length=FLAGS.sequence_len,
         radius=FLAGS.radius,
         seed=1337,
     )
-    val_x, val_y, _ = collect_data(
+    val_x, val_y = collect_data(
         num_sequences=validation_sequences,
         sequence_length=FLAGS.sequence_len,
         radius=FLAGS.radius,
         seed=5332,
     )
 
-    from experiments.npe.train import breakdown
-
     print("Breaking down!")
     btrain_x = breakdown(train_x)
     bval_x = breakdown(val_x)
 
     print("Saving!")
-    np.savez(FLAGS.dataset, *btrain_x, *bval_x, train_y=train_y, val_y=val_y)
+    np.savez(
+        FLAGS.dataset,
+        *btrain_x,
+        *bval_x,
+        train_y=train_y,
+        val_y=val_y,
+        config={
+            "scene": FLAGS.scene,
+            "num_sequences": FLAGS.num_sequences,
+            "sequence_len": FLAGS.sequence_len,
+            "num_objects": (len(btrain_x) - 1) // 2 + 1,
+        }
+    )
 
 
 def show_world():
-    scene = ThreeCircles(headless=False, radius=FLAGS.radius)
+    scene = create_scene()
 
     for frame in range(FLAGS.simulation_steps):
+        print(frame)
         scene.step()
         scene.draw()
 

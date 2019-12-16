@@ -7,7 +7,14 @@ import pymunk
 
 
 class World(object):
-    def __init__(self, width=500, height=500, gravity=(0, 0), wall_elasticity=0.8):
+    def __init__(
+        self,
+        width=500,
+        height=500,
+        gravity=(0, 0),
+        wall_elasticity=0.8,
+        wall_friction=0.4,
+    ):
         self.width = width
         self.height = height
 
@@ -20,13 +27,29 @@ class World(object):
         self.id_counter = 0
 
         # Add invisible walls at edges.
-        self.add_entity(Wall((-5, self.height / 2), 10, self.height, wall_elasticity))
         self.add_entity(
-            Wall((self.width + 5, self.height / 2), 10, self.height, wall_elasticity)
+            Wall((-5, self.height / 2), 10, self.height, wall_elasticity, wall_friction)
         )
-        self.add_entity(Wall((self.width / 2, -5), self.width, 10, wall_elasticity))
         self.add_entity(
-            Wall((self.width / 2, self.height + 5), self.width, 10, wall_elasticity)
+            Wall(
+                (self.width + 5, self.height / 2),
+                10,
+                self.height,
+                wall_elasticity,
+                wall_friction,
+            )
+        )
+        self.add_entity(
+            Wall((self.width / 2, -5), self.width, 10, wall_elasticity, wall_friction)
+        )
+        self.add_entity(
+            Wall(
+                (self.width / 2, self.height + 5),
+                self.width,
+                10,
+                wall_elasticity,
+                wall_friction,
+            )
         )
 
     def add_entity(self, entity):
