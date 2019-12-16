@@ -12,7 +12,7 @@ from renderer.rectangles import Rectangles
 
 # NPE-related
 from experiments.npe.train import breakdown
-from experiments.npe_bt.datagen import collect_data
+from experiments.npe.datagen import collect_data
 from experiments.npe_bt.simulate import show_simulation
 from experiments.npe_bt.train import start_train
 
@@ -72,13 +72,13 @@ def generate_data():
 
     validation_sequences = int(FLAGS.num_sequences * FLAGS.validation_split)
 
-    train_x, train_y = collect_data(
+    train_x, train_y, train_complex = collect_data(
         num_sequences=FLAGS.num_sequences,
         sequence_length=FLAGS.sequence_len,
         radius=FLAGS.radius,
         seed=1337,
     )
-    val_x, val_y = collect_data(
+    val_x, val_y, _ = collect_data(
         num_sequences=validation_sequences,
         sequence_length=FLAGS.sequence_len,
         radius=FLAGS.radius,
@@ -96,6 +96,7 @@ def generate_data():
         *bval_x,
         train_y=train_y,
         val_y=val_y,
+        train_complex=train_complex,
         config={
             "scene": FLAGS.scene,
             "num_sequences": FLAGS.num_sequences,

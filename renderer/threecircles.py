@@ -29,18 +29,7 @@ class ThreeCircles(object):
         self.radius = radius
 
         self.circles = [
-            # Circle(
-            #     position=(
-            #         random.randint(radius, width - radius),
-            #         random.randint(radius, height - radius),
-            #     ),
-            #     velocity=(
-            #         random.randint(-MAX_VELOCITY, MAX_VELOCITY),
-            #         random.randint(-MAX_VELOCITY, MAX_VELOCITY),
-            #     ),
-            #     r=radius,
-            # )
-            Rect(
+            Circle(
                 position=(
                     random.randint(radius, width - radius),
                     random.randint(radius, height - radius),
@@ -49,9 +38,20 @@ class ThreeCircles(object):
                     random.randint(-MAX_VELOCITY, MAX_VELOCITY),
                     random.randint(-MAX_VELOCITY, MAX_VELOCITY),
                 ),
-                width=int(radius * 2),
-                height=int(radius * 2),
+                r=radius,
             )
+            # Rect(
+            #     position=(
+            #         random.randint(radius, width - radius),
+            #         random.randint(radius, height - radius),
+            #     ),
+            #     velocity=(
+            #         random.randint(-MAX_VELOCITY, MAX_VELOCITY),
+            #         random.randint(-MAX_VELOCITY, MAX_VELOCITY),
+            #     ),
+            #     width=int(radius * 2),
+            #     height=int(radius * 2),
+            # )
             for _ in range(3)
         ]
 

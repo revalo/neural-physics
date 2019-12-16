@@ -6,6 +6,8 @@ from renderer.threecircles import ThreeCircles
 from experiments.npe.datagen import normalize_position, normalize_velocity
 from renderer.constants import TARGET_FPS, MAX_VELOCITY
 
+import tqdm
+
 
 def get_circle_state(scene, circle):
     return np.array(
@@ -46,7 +48,10 @@ def show_simulation(
     length=500,
     past_steps=2,
     neighborhood_mask=60 * 3,
+    draw=True,
+    old=False,
 ):
+    outputs = []
     scene = ThreeCircles(headless=False, width=width, height=height, radius=radius)
 
     # Buffer steps
@@ -103,16 +108,30 @@ def show_simulation(
 
             states[i].append(new_state)
 
+        outputs.append([])
         for i, circle in enumerate(scene.circles):
             circle.position = (states[i][-1][0], states[i][-1][1])
+            outputs[-1].append((states[i][-1][0], states[i][-1][1]))
 
-        scene.draw()
+        if draw:
+            scene.draw()
+
+    return outputs
 
 
 def show_simulation_variational(
-    model, width=256, height=256, radius=30, length=500, past_steps=2
+    model,
+    width=256,
+    height=256,
+    radius=30,
+    length=500,
+    past_steps=2,
+    draw=True,
+    rollouts=50,
 ):
     scene = ThreeCircles(headless=False, width=width, height=height, radius=radius)
+
+    outputs = [[] for _ in range(rollouts)]
 
     # Buffer steps
     scene.step()
@@ -135,7 +154,7 @@ def show_simulation_variational(
                 )
             )
 
-    for simulations in range(50):
+    for simulation in tqdm.tqdm(range(rollouts)):
         states = [x[:] for x in states_init]
 
         for circle in scene.circles:
@@ -177,7 +196,12 @@ def show_simulation_variational(
 
                 states[i].append(new_state)
 
+            outputs[simulation].append([])
             for i, circle in enumerate(scene.circles):
                 circle.position = (states[i][-1][0], states[i][-1][1])
+                outputs[simulation][-1].append(circle.position)
 
-            scene.draw_trails()
+            if draw:
+                scene.draw_trails()
+
+    return outputs
