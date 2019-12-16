@@ -114,7 +114,7 @@ def collect_data(
             y.append(final_state)
             complexities.append(get_complexity(scene.circle_circle, scene.circle_wall))
 
-    return X, y
+    return X, y, complexities
 
 
 if __name__ == "__main__":
