@@ -1,14 +1,13 @@
-# Playground
+# Neural Probablistic Physics
 
 Attempt to be sample efficient in learning intuitive physics by treating the environment
-as a playground.
+as a playground. Our uncertainty based approach learns 5x faster than vanilla SGD.
 
 Here are a few results from the trained model.
 
 <p float="left">
   <img src="https://media.giphy.com/media/Plb0EGbZO21Z2tTh9U/giphy.gif" width="150" />
   <img src="https://media.giphy.com/media/TdA4u4xPtJ6WrraOJ0/giphy.gif" width="150" /> 
-  <img src="https://media.giphy.com/media/eHA4d84YDibe2W2QfR/giphy.gif" width="150" />
 </p>
 
 Our model is probablistic, here are examples of a few rollouts,
