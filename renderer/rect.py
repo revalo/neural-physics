@@ -30,10 +30,10 @@ class Rect(Entity):
         body.position = self.position
 
         shape = pymunk.Poly.create_box(body, size=(self.width, self.height))
-        # shape.elasticity = 0.5
-        # shape.friction = 0.4
-        shape.elasticity = 1.0
-        shape.friction = 0.0
+        shape.elasticity = 0.5
+        shape.friction = 0.4
+        # shape.elasticity = 1.0
+        # shape.friction = 0.0
 
         return shape
 

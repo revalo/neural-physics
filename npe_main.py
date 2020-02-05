@@ -1,4 +1,16 @@
-"""Main endpoint for working with the NPE engine."""
+"""Driver file for data generation, scene inspection and vanilla NPE training.
+
+This driver file encapsulate reproducing the neural physics engine results, and
+extending it to work on scenes like BlockTower, where we have angular rotations and
+velocities at play.
+
+Examples,
+
+    python npe_main.py -g --dataset data/circles.npz --scene ThreeCircles
+    python npe_main.py --show_world --scene BlockTower
+
+Pass in the --help flag for a more throrough documentation.
+"""
 
 import tensorflow as tf
 import numpy as np
@@ -12,7 +24,6 @@ from renderer.rectangles import Rectangles
 
 # NPE-related
 from experiments.npe.train import breakdown
-from experiments.npe.datagen import collect_data
 from experiments.npe_bt.simulate import show_simulation
 from experiments.npe_bt.train import start_train
 
@@ -68,6 +79,16 @@ def generate_data():
             pass
     except IOError:
         print("Please pass in valid dataset location.")
+        return
+
+    # TODO(shreyask): This is an incredibly jank way to switch scenes.
+
+    if FLAGS.scene == "ThreeCircles":
+        from experiments.npe.datagen import collect_data
+    elif FLAGS.scene == "BlockTower":
+        from experiments.npe_bt.datagen import collect_data
+    else:
+        print("Scene not defined!")
         return
 
     validation_sequences = int(FLAGS.num_sequences * FLAGS.validation_split)

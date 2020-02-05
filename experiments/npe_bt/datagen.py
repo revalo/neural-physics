@@ -119,7 +119,8 @@ def collect_data(
             X.append([key_state] + context_states + used)
             y.append(final_state)
 
-    return X, y
+    # TODO(shreyask): Actually return complexities.
+    return X, y, []
 
 
 if __name__ == "__main__":

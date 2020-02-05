@@ -24,7 +24,7 @@ MAX_VELOCITY = 150
 
 NUM_RECTANGLES = 6
 
-X_VARIATION = 10
+X_VARIATION = 20
 
 
 class Rectangles(Scene):
@@ -36,8 +36,8 @@ class Rectangles(Scene):
         width=256,
         height=256,
         wall_elasticity=0.8,
-        rect_height=20,
-        rect_width=20,
+        rect_height=40,
+        rect_width=40,
         bkg_color=BACKGROUND,
     ):
         rects = [
